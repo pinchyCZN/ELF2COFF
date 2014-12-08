@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef unsigned char uint8;
 typedef unsigned short uint16;
@@ -14,6 +15,13 @@ typedef __int64 int64;
 #include "elf.h"
 #include "coff.h"
 
+int dump_elf(FILE *f)
+{
+	if(f){
+		
+	}
+}
+
 int dump_obj_file(char *fname)
 {
 	if(fname){
@@ -21,8 +29,12 @@ int dump_obj_file(char *fname)
 		f=fopen(fname,"rb");
 		if(f){
 			char buf[8]={0};
-			fread(buf,1,4,f);
-
+			char *elfmagic=ELFMAG;
+			int len=sizeof(ELFMAG)-1;
+			fread(buf,1,len,f);
+			if(memcmp(buf,elfmagic,len)==0){
+				dump_elf(f);
+			}
 			fclose(f);
 		}
 
