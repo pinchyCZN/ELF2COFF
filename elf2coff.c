@@ -132,14 +132,180 @@ int get_sheader_val(int member,int index,unsigned char *buf,int buf_size,int *re
 	}
 	return FALSE;
 }
+int read_header_val(int member,int val)
+{
+	switch(member){
+	case e_ident:
+		printf("magic header");
+		break;
+	case e_bitness:
+		switch(val){
+		case 1:printf("32 bit");break;
+		case 2:printf("64 bit");break;
+		default:printf("invalid");break;
+		}
+		break;
+	case e_endian:
+		switch(val){
+		case 1:printf("little endian");break;
+		case 2:printf("big endian");break;
+		default:printf("invalid");break;
+		}
+		break;
+	case e_elfver:
+		switch(val){
+		case 1:printf("elf version");break;
+		default:printf("invalid");break;
+		}
+		break;
+	case e_reserved0:printf("reserved0");
+		break;
+	case e_reserved1:printf("reserved1");
+		break;
+	case e_reserved2:printf("reserved2");
+		break;
+	case e_type:
+		printf("file type:");
+		switch(val){
+		case ET_NONE:printf("No file type");break;
+		case ET_REL:printf("Relocatable");break;
+		case ET_EXEC:printf("Executable");break;
+		default:printf("other");break;
+		}
+		break;
+	case e_machine:
+		printf("architecture:");
+		switch(val){
+		case EM_MIPS:printf("MIPS");break;
+		default:printf("other");break;
+		}
+		break;
+	case e_version:
+		printf("version:");
+		switch(val){
+		case EV_NONE:printf("Invalid ELF version");break;
+		case EV_CURRENT:printf("Current");break;
+		case EV_NUM:printf("num");break;
+		}
+		break;
+	case e_entry:
+		break;
+	case e_phoff:
+		break;
+	case e_shoff:
+		break;
+	case e_flags:
+		{
+			int i;
+			printf("\n\t(flags valid only for MIPS):\n");
+			for(i=0;i<32;i++){
+				int printed=TRUE;
+				int bit=val&(1<<i);
+				if(bit!=0)
+					printf("\t");
+				switch(bit){
+				case EF_MIPS_NOREORDER:printf("At least one .noreorder assembly");break;
+				case EF_MIPS_PIC:printf("This file contains position-independent code");break;
+				case E_MIPS_ABI_O32:printf("This file follows the first MIPS 32 bit ABI");break;
+				case E_MIPS_ABI_O64:printf("This file follows the UCODE MIPS 64 bit ABI");break;
+				case E_MIPS_ABI_EABI32:printf("Embedded Application Binary Interface for 32-bit");break;
+				case E_MIPS_ABI_EABI64:printf("Embedded Application Binary Interface for 64-bit");break;
+				default:
+					if(bit!=0){
+						printf("other flag %08X",bit);
+						printed=TRUE;
+					}
+					else
+						printed=FALSE;
+					break;
+				}
+				if(printed){
+					printf("\n");
+				}
+			}
+		}
+		break;
+	case e_ehsize:
+		break;
+	case e_phentsize:
+		break;
+	case e_phnum:
+		break;
+	case e_shentsize:
+		break;
+	case e_shnum:
+		break;
+	case e_shstrndx:
+		break;
+	}
+}
+int read_shead_val(int member,int val)
+{
+	switch(member){
+	case sh_type:
+		switch(val){
+		case SHT_NULL:printf("Section header table entry unused");break;
+		case SHT_PROGBITS:printf("Program data");break;
+		case SHT_SYMTAB:printf("Symbol table");break;
+		case SHT_STRTAB:printf("String table");break;
+		case SHT_RELA:printf("Relocation entries with addends. Warning: Works only in 64 bit mode in my tests!");break;
+		case SHT_HASH:printf("Symbol hash table");break;
+		case SHT_DYNAMIC:printf("Dynamic linking information");break;
+		case SHT_NOTE:printf("Notes");break;
+		case SHT_NOBITS:printf("Program space with no data (bss)");break;
+		case SHT_REL:printf("Relocation entries, no addends");break;
+		case SHT_SHLIB:printf("Reserved");break;
+		case SHT_DYNSYM:printf("Dynamic linker symbol table");break;
+		case SHT_INIT_ARRAY:printf("Array of constructors");break;
+		case SHT_FINI_ARRAY:printf("Array of destructors");break;
+		case SHT_PREINIT_ARRAY:printf("Array of pre-constructors");break;
+		case SHT_GROUP:printf("Section group");break;
+		case SHT_SYMTAB_SHNDX:printf("Extended section indeces");break;
+		case SHT_NUM:printf("Number of defined types. ");break;
+		case SHT_LOOS:printf("Start OS-specific");break;
+		case SHT_CHECKSUM:printf("Checksum for DSO content. ");break;
+		case SHT_LOSUNW:printf("Sun-specific low bound. ");break;
+		case SHT_GNU_verdef:printf("Version definition section. ");break;
+		case SHT_GNU_verneed:printf("Version needs section. ");break;
+		case SHT_GNU_versym:printf("Version symbol table. ");break;
+		case SHT_LOPROC:printf("Start of processor-specific");break;
+		case SHT_HIPROC:printf("End of processor-specific");break;
+		case SHT_LOUSER:printf("Start of application-specific");break;
+		case SHT_HIUSER:printf("End of application-specific");break;
+		case SHT_REMOVE_ME:printf("Specific to objconv program: Removed debug or exception handler section");break;
+		}
+		break;
+	case sh_flags:
+		switch(val){
+		case SHF_WRITE:printf("Writable");break;
+		case SHF_ALLOC:printf("Occupies memory during execution");break;
+		case SHF_EXECINSTR:printf("Executable");break;
+		case SHF_MERGE:printf("Might be merged");break;
+		case SHF_STRINGS:printf("Contains nul-terminated strings");break;
+		case SHF_INFO_LINK:printf("`sh_info' contains SHT index");break;
+		case SHF_LINK_ORDER:printf("Preserve order after combining");break;
+		case SHF_OS_NONCONFORMING:printf("Non-standard OS specific handling required");break;
+		case SHF_MASKOS:printf("OS-specific. ");break;
+		case SHF_MASKPROC:printf("Processor-specific");break;
+		}
+		break;
+	case sh_link:
+		break;
+	case sh_info:
+		break;
+	}
+}
 int dump_elf(unsigned char *buf,int len)
 {
 	if(buf && len>0){
 		int i,sect_count;
 		for(i=0;i<sizeof(ELF_HEADER_NAMES)/sizeof(char *);i++){
 			int val=0;
-			if(get_header_val(i,buf,len,&val))
-				printf("%-11s=0x%08X\n",ELF_HEADER_NAMES[i],val);
+			if(get_header_val(i,buf,len,&val)){
+				printf("%-11s=0x%08X ",ELF_HEADER_NAMES[i],val);
+				read_header_val(i,val);
+			}
+			printf("\n");
 		}
 		if(get_header_val(e_shnum,buf,len,&sect_count)){
 			int j;
@@ -148,7 +314,18 @@ int dump_elf(unsigned char *buf,int len)
 				for(i=0;i<sizeof(ELF_SHEADER_NAMES)/sizeof(char *);i++){
 					int val=0;
 					if(get_sheader_val(i,j,buf,len,&val)){
-						printf("%-12s=0x%08X\n",ELF_SHEADER_NAMES[i],val);
+						printf("%-12s=0x%08X ",ELF_SHEADER_NAMES[i],val);
+						read_shead_val(i,val);
+						if(i==sh_name){
+							int name_index;
+							if(get_header_val(e_shstrndx,buf,len,&name_index)){
+								int name_offset;
+								if(get_sheader_val(sh_offset,name_index,buf,len,&name_offset)){
+									printf("-> %s",buf+name_offset+val);
+								}
+							}
+						}
+						printf("\n");
 					}
 				}
 			}

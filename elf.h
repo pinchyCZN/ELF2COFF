@@ -856,4 +856,33 @@ struct Elf64_Move {
 #define ELF32STRUCTURES  Elf32_Ehdr, Elf32_Shdr, Elf32_Sym, Elf32_Rela
 #define ELF64STRUCTURES  Elf64_Ehdr, Elf64_Shdr, Elf64_Sym, Elf64_Rela
 
+#define EF_MIPS_NOREORDER	0x00000001	//At least one .noreorder assembly directive appeared in a source contributing to the object 
+#define EF_MIPS_PIC			0x00000002	//This file contains position-independent code 
+#define EF_MIPS_CPIC		0x00000004	//This file's code follows standard conventions for calling position-independent code. 
+#define EF_MIPS_XGOT		0x00000008	//This file contains large (32-bit) GOT 
+#define EF_MIPS_UCODE		0x00000010	//This file contains UCODE (obsolete) 
+#define EF_MIPS_64BIT_WHIRL	0x00000010	//This file contains WHIRL intermediate relocation language code (SGI/Open64) 
+#define EF_MIPS_ABI2		0x00000020	//This file follows the n32 abi 
+#define EF_MIPS_ABI_ON32	0x00000040	//(obsolete) 
+#define EF_MIPS_OPTIONS_FIRST	0x00000080	//The .MIPS.options section in this file contains one or more descriptors, currently types ODK_GP_GROUP and/or ODK_IDENT, which should be processed first by ld. 
+#define EF_MIPS_32BITMODE	0x00000100	//binaries compiled for a 32bit ABI, but a 64bit ISA, have this flag set, as the kernel will refuse to execute 64bt code (i.e. not o32 or n32 ABI). 
+#define E_MIPS_FP64		0x00000200	//32-bit machine but FP registers are 64 bit (-mfp64). 
+#define E_MIPS_NAN2008	0x00000400	//Code in file uses the IEEE 754-2008 NaN encoding convention. 
+#define E_MIPS_ABI_O32	0x00001000	//This file follows the first MIPS 32 bit ABI (UCODE). Unknown if this flag is actually used. 
+#define E_MIPS_ABI_O64	0x00002000	//This file follows the UCODE MIPS 64 bit ABI (obsolete) 
+#define E_MIPS_ABI_EABI32	0x00003000	//Embedded Application Binary Interface for 32-bit 
+#define E_MIPS_ABI_EABI64	0x00004000	//Embedded Application Binary Interface for 64-bit 
+#define EF_MIPS_ARCH_ASE_MDMX	0x08000000	//Uses MDMX multimedia extensions 
+#define EF_MIPS_ARCH_ASE_M16	0x04000000	//Uses MIPS-16 ISA extensions 
+#define EF_MIPS_ARCH_ASE_MICROMIPS	0x02000000	//Uses MicroMips. Actually not an extension, but a full architecture 
+#define EF_MIPS_ARCH_1		0x00000000	//Contains MIPS I instruction set 
+#define EF_MIPS_ARCH_2		0x10000000	//Contains MIPS II instruction set 
+#define EF_MIPS_ARCH_3		0x20000000	//Contains MIPS III instruction set 
+#define EF_MIPS_ARCH_4		0x30000000	//MIPS IV is the fourth version of the architecture. It is a superset of MIPS III and is compatible with all existing versions of MIPS. 
+#define EF_MIPS_ARCH_5		0x40000000	//Never introduced 
+#define EF_MIPS_ARCH_32		0x50000000	//This file will run on a machine with the architecture describe for Mips32 Revision 1 
+#define EF_MIPS_ARCH_64		0x60000000	//This file will run on a machine with the architecture describe for Mips64 Revision 1 
+#define EF_MIPS_ARCH_32R2	0x70000000	//This file will run on a machine with the architecture describe for Mips32 Revision 2 
+#define EF_MIPS_ARCH_64R2	0x80000000	//This file will run on a machine with the architecture describe for Mips64 Revision 2
+
 #endif // #ifndef ELF_H
