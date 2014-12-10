@@ -15,7 +15,7 @@
 
 /********************** FILE HEADER **********************/
 
-struct Elf32_Ehdr {
+struct ELF32_HEADER {
   uint8   e_ident[4];   // Magic number and other info
   uint8   e_bitness;	//0=invalid,1=32bit,2=64bit
   uint8   e_endian;		//0=invalid,1=little,2=big
@@ -185,7 +185,7 @@ struct Elf64_Ehdr {
 
 /* Section header.  */
 
-struct Elf32_Shdr {
+struct ELF32_SHDR {
   uint32  sh_name;      // Section name (string tbl index)
   uint32  sh_type;      // Section type
   uint32  sh_flags;     // Section flags
