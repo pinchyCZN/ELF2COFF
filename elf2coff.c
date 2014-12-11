@@ -32,7 +32,7 @@ const char *ELF_SHEADER_NAMES[10]={
 };
 enum {sh_name=0,sh_type,sh_flags,sh_addr,sh_offset,sh_size,sh_link,sh_info,sh_addralign,sh_entsize};
 
-
+enum {r_offset,r_type,r_sym};
 
 #define MEMBER_OFFSET 0
 #define MEMBER_SIZE 1
@@ -132,6 +132,33 @@ int get_sheader_val(int member,int index,unsigned char *buf,int buf_size,int *re
 	}
 	return FALSE;
 }
+int get_reloc_entry(int member,int index,int offset,unsigned char *buf,int buf_size,int *result)
+{
+	int data,endian;
+	data=offset+index*sizeof(struct Elf32_Rel);
+	if((data+8)>(buf+buf_size)){
+		printf("relocation entry out of range");
+		return FALSE;
+	}
+	if(get_header_val(e_endian,buf,buf_size,&endian)){
+		int val=0;
+		switch(member){
+		default:printf("invalid relocation member");return FALSE;break;
+		case r_offset:
+			val=get_data(data,0,4,endian);
+			break;
+		case r_type:
+			break;
+		case r_sym:
+			break;
+		}
+		if(result)
+			*result=val;
+		return TRUE;
+	}
+	return FALSE;
+}
+
 int read_header_val(int member,int val)
 {
 	switch(member){
@@ -392,7 +419,7 @@ int dump_elf(unsigned char *buf,int len)
 		if(get_header_val(e_shnum,buf,len,&sect_count)){
 			int j;
 			for(j=0;j<sect_count;j++){
-				printf("---section %i-----\n",j);
+				printf("---section %i (0x%X)-----\n",j,j);
 				for(i=0;i<sizeof(ELF_SHEADER_NAMES)/sizeof(char *);i++){
 					int val=0;
 					if(get_sheader_val(i,j,buf,len,&val)){
@@ -408,6 +435,22 @@ int dump_elf(unsigned char *buf,int len)
 							}
 						}
 						printf("\n");
+					}
+				}
+			}
+			//dump relocations
+			for(j=0;j<sect_count;j++){
+				int val=0;
+				if(get_sheader_val(sh_type,j,buf,len,&val)){
+					if(val==SHT_REL){
+						int offset,size;
+						if(get_sheader_val(sh_type,j,buf,len,&offset)
+							&& get_sheader_val(sh_type,j,buf,len,&size)){
+							int roffset,rtype,rsym;
+							get_reloc_entry(r_offset,offset,size,buf,len,&roffset);
+							get_reloc_entry(r_type,offset,size,buf,len,&rtype);
+							get_reloc_entry(r_sym,offset,size,buf,len,&rsym);
+						}
 					}
 				}
 			}

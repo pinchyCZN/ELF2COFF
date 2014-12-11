@@ -851,11 +851,6 @@ struct Elf64_Move {
 #define ELF_CONSTRUCTOR_NAME    ".ctors"   // Name of constructors segment
 
 
-// Macros listing all word-size dependent structures, used as template parameter list
-#define ELFSTRUCTURES    TELF_Header, TELF_SectionHeader, TELF_Symbol, TELF_Relocation
-#define ELF32STRUCTURES  Elf32_Ehdr, Elf32_Shdr, Elf32_Sym, Elf32_Rela
-#define ELF64STRUCTURES  Elf64_Ehdr, Elf64_Shdr, Elf64_Sym, Elf64_Rela
-
 #define EF_MIPS_NOREORDER	0x00000001	//At least one .noreorder assembly directive appeared in a source contributing to the object 
 #define EF_MIPS_PIC			0x00000002	//This file contains position-independent code 
 #define EF_MIPS_CPIC		0x00000004	//This file's code follows standard conventions for calling position-independent code. 
