@@ -282,7 +282,7 @@ int read_shead_val(int member,unsigned int val)
 		case SHT_PROGBITS:printf("Program data");break;
 		case SHT_SYMTAB:printf("Symbol table");break;
 		case SHT_STRTAB:printf("String table");break;
-		case SHT_RELA:printf("Relocation entries with addends. Warning: Works only in 64 bit mode in my tests!");break;
+		case SHT_RELA:printf("Relocation entries with addends");break;
 		case SHT_HASH:printf("Symbol hash table");break;
 		case SHT_DYNAMIC:printf("Dynamic linking information");break;
 		case SHT_NOTE:printf("Notes");break;
