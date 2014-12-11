@@ -197,19 +197,53 @@ int read_header_val(int member,int val)
 	case e_flags:
 		{
 			int i;
-			printf("\n\t(flags valid only for MIPS):\n");
+			printf("\n\t(flags valid only for MIPS):\n\t");
+			switch(val&EF_MIPS_ARCH){
+			case EF_MIPS_ARCH_1:printf("-mips1 code");break;
+			case EF_MIPS_ARCH_2:printf("-mips2 code");break;
+			case EF_MIPS_ARCH_3:printf("-mips3 code");break;
+			case EF_MIPS_ARCH_4:printf("-mips4 code");break;
+			case EF_MIPS_ARCH_5:printf("-mips5 code");break;
+			case EF_MIPS_ARCH_32:printf("MIPS32 code");break;
+			case EF_MIPS_ARCH_64:printf("MIPS64 code");break;
+			case EF_MIPS_ARCH_32R2:printf("MIPS32r2 code");break;
+			case EF_MIPS_ARCH_64R2:printf("MIPS64r2 code");break;
+			}
+			printf("\n");
 			for(i=0;i<32;i++){
 				int printed=TRUE;
 				int bit=val&(1<<i);
 				if(bit!=0)
 					printf("\t");
 				switch(bit){
-				case EF_MIPS_NOREORDER:printf("At least one .noreorder assembly");break;
+				case EF_MIPS_NOREORDER:printf("At least one .noreorder assembly directive appeared in a source contributing to the object");break;
 				case EF_MIPS_PIC:printf("This file contains position-independent code");break;
-				case E_MIPS_ABI_O32:printf("This file follows the first MIPS 32 bit ABI");break;
-				case E_MIPS_ABI_O64:printf("This file follows the UCODE MIPS 64 bit ABI");break;
+				case EF_MIPS_CPIC:printf("This file's code follows standard conventions for calling position-independent code");break;
+				case EF_MIPS_XGOT:printf("This file contains large (32-bit) GOT");break;
+				case EF_MIPS_64BIT_WHIRL:printf("This file contains WHIRL intermediate relocation language code (SGI/Open64)");break;
+				case EF_MIPS_ABI2:printf("This file follows the n32 abi");break;
+				case EF_MIPS_ABI_ON32:printf("(obsolete)");break;
+				case EF_MIPS_OPTIONS_FIRST:printf("The .MIPS.options section in this file contains one or more descriptors, currently types ODK_GP_GROUP and/or ODK_IDENT, which should be processed first by ld");break;
+				case EF_MIPS_32BITMODE:printf("binaries compiled for a 32bit ABI, but a 64bit ISA, have this flag set, as the kernel will refuse to execute 64bt code (i.e. not o32 or n32 ABI)");break;
+				case E_MIPS_FP64:printf("32-bit machine but FP registers are 64 bit (-mfp64)");break;
+				case E_MIPS_NAN2008:printf("Code in file uses the IEEE 754-2008 NaN encoding convention");break;
+				case E_MIPS_ABI_O32:
+					if((val&E_MIPS_ABI_EABI32)!=E_MIPS_ABI_EABI32){
+						printf("This file follows the first MIPS 32 bit ABI (UCODE)");break;
+					}
+					printed=FALSE;
+					break;
+				case E_MIPS_ABI_O64:
+					if((val&E_MIPS_ABI_EABI32)!=E_MIPS_ABI_EABI32){
+						printf("This file follows the UCODE MIPS 64 bit ABI (obsolete)");break;
+						break;
+					}
+					//fall thru E_MIPS_ABI_EABI32	0x00003000
 				case E_MIPS_ABI_EABI32:printf("Embedded Application Binary Interface for 32-bit");break;
 				case E_MIPS_ABI_EABI64:printf("Embedded Application Binary Interface for 64-bit");break;
+				case EF_MIPS_ARCH_ASE_MDMX:printf("Uses MDMX multimedia extensions");break;
+				case EF_MIPS_ARCH_ASE_M16:printf("Uses MIPS-16 ISA extensions");break;
+				case EF_MIPS_ARCH_ASE_MICROMIPS:printf("Uses MicroMips. Actually not an extension, but a full architecture");break;
 				default:
 					if(bit!=0){
 						printf("other flag %08X",bit);
@@ -239,7 +273,7 @@ int read_header_val(int member,int val)
 		break;
 	}
 }
-int read_shead_val(int member,int val)
+int read_shead_val(int member,unsigned int val)
 {
 	switch(member){
 	case sh_type:
@@ -268,25 +302,73 @@ int read_shead_val(int member,int val)
 		case SHT_GNU_verdef:printf("Version definition section. ");break;
 		case SHT_GNU_verneed:printf("Version needs section. ");break;
 		case SHT_GNU_versym:printf("Version symbol table. ");break;
-		case SHT_LOPROC:printf("Start of processor-specific");break;
-		case SHT_HIPROC:printf("End of processor-specific");break;
 		case SHT_LOUSER:printf("Start of application-specific");break;
 		case SHT_HIUSER:printf("End of application-specific");break;
-		case SHT_REMOVE_ME:printf("Specific to objconv program: Removed debug or exception handler section");break;
+		default:
+			if(val>=SHT_LOPROC && val<=SHT_HIPROC){
+				switch(val){
+				case SHT_MIPS_LIBLIST:printf("DSO library information used to link");break;
+				case SHT_MIPS_MSYM:printf("MIPS symbol table extension");break;
+				case SHT_MIPS_CONFLICT:printf("Symbol conflicting with DSO defined symbols");break;
+				case SHT_MIPS_GPTAB:printf("Global pointer table");break;
+				case SHT_MIPS_UCODE:printf("Reserved");break;
+				case SHT_MIPS_DEBUG:printf("Reserved (obsolete debug information)");break;
+				case SHT_MIPS_REGINFO:printf("Register usage information");break;
+				case SHT_MIPS_PACKAGE:printf("OSF reserved");break;
+				case SHT_MIPS_PACKSYM:printf("OSF reserved");break;
+				case SHT_MIPS_RELD:printf("Dynamic relocations (obsolete)");break;
+				case SHT_MIPS_IFACE:printf("Subprogram interface information");break;
+				case SHT_MIPS_CONTENT:printf("Section content information");break;
+				case SHT_MIPS_OPTIONS:printf("General options");break;
+				case SHT_MIPS_DELTASYM:printf("Delta C++ symbol table (obsolete)");break;
+				case SHT_MIPS_DELTAINST:printf("Delta C++ instance table (obsolete)");break;
+				case SHT_MIPS_DELTACLASS:printf("Delta C++ class table (obsolete)");break;
+				case SHT_MIPS_DWARF:printf("Dwarf debug information");break;
+				case SHT_MIPS_DELTADECL:printf("Delta C++ declarations (obsolete)");break;
+				case SHT_MIPS_SYMBOL_LIB:printf("Symbol to library mapping");break;
+				case SHT_MIPS_EVENTS:printf("Section event mapping");break;
+				case SHT_MIPS_TRANSLATE:printf("Old pixie translation table (obsolete)");break;
+				case SHT_MIPS_PIXIE:printf("Pixie specific sections (SGI)");break;
+				case SHT_MIPS_XLATE:printf("Address translation table");break;
+				case SHT_MIPS_XLATE_DEBUG:printf("SGI internal address translation table");break;
+				case SHT_MIPS_WHIRL:printf("Intermediate code (MipsPro compiler)");break;
+				case SHT_MIPS_EH_REGION:printf("C++ exception handling region information");break;
+				case SHT_MIPS_XLATE_OLD:printf("obsolete");break;
+				case SHT_MIPS_PDR_EXCEPTION:printf("Runtime procedure descriptor table exception information (ucode");break;
+				}
+			}else if(val>=SHT_LOUSER && val<=SHT_HIUSER){
+				printf("application specific");
+			}
+			break;
 		}
 		break;
 	case sh_flags:
-		switch(val){
-		case SHF_WRITE:printf("Writable");break;
-		case SHF_ALLOC:printf("Occupies memory during execution");break;
-		case SHF_EXECINSTR:printf("Executable");break;
-		case SHF_MERGE:printf("Might be merged");break;
-		case SHF_STRINGS:printf("Contains nul-terminated strings");break;
-		case SHF_INFO_LINK:printf("`sh_info' contains SHT index");break;
-		case SHF_LINK_ORDER:printf("Preserve order after combining");break;
-		case SHF_OS_NONCONFORMING:printf("Non-standard OS specific handling required");break;
-		case SHF_MASKOS:printf("OS-specific. ");break;
-		case SHF_MASKPROC:printf("Processor-specific");break;
+		{
+			int i;
+			for(i=0;i<32;i++){
+				int bit;
+				bit=val&(1<<i);
+				switch(bit){
+				case SHF_WRITE:printf("Writable");break;
+				case SHF_ALLOC:printf("Occupies memory during execution");break;
+				case SHF_EXECINSTR:printf("Executable");break;
+				case SHF_MERGE:printf("Might be merged");break;
+				case SHF_STRINGS:printf("Contains nul-terminated strings");break;
+				case SHF_INFO_LINK:printf("`sh_info' contains SHT index");break;
+				case SHF_LINK_ORDER:printf("Preserve order after combining");break;
+				case SHF_OS_NONCONFORMING:printf("Non-standard OS specific handling required");break;
+				case SHF_MIPS_GPREL:printf("SHF_MIPS_GPREL");break;
+				case SHF_MIPS_MERGE:printf("SHF_MIPS_MERGE");break;
+				case SHF_MIPS_ADDR:printf("SHF_MIPS_ADDR");break;
+				case SHF_MIPS_STRINGS:printf("SHF_MIPS_STRINGS");break;
+				case SHF_MIPS_NOSTRIP:printf("SHF_MIPS_NOSTRIP");break;
+				case SHF_MIPS_LOCAL:printf("SHF_MIPS_LOCAL");break;
+				case SHF_MIPS_NAMES:printf("SHF_MIPS_NAMES");break;
+				case SHF_MIPS_NODUPE:printf("SHF_MIPS_NODUPE");break;
+				}
+				if(bit)
+					printf(",");
+			}
 		}
 		break;
 	case sh_link:

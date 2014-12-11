@@ -875,6 +875,8 @@ struct Elf64_Move {
 #define EF_MIPS_ARCH_ASE_MDMX	0x08000000	//Uses MDMX multimedia extensions 
 #define EF_MIPS_ARCH_ASE_M16	0x04000000	//Uses MIPS-16 ISA extensions 
 #define EF_MIPS_ARCH_ASE_MICROMIPS	0x02000000	//Uses MicroMips. Actually not an extension, but a full architecture 
+
+#define EF_MIPS_ARCH        0xf0000000  /* MIPS architecture level */
 #define EF_MIPS_ARCH_1		0x00000000	//Contains MIPS I instruction set 
 #define EF_MIPS_ARCH_2		0x10000000	//Contains MIPS II instruction set 
 #define EF_MIPS_ARCH_3		0x20000000	//Contains MIPS III instruction set 
@@ -884,5 +886,72 @@ struct Elf64_Move {
 #define EF_MIPS_ARCH_64		0x60000000	//This file will run on a machine with the architecture describe for Mips64 Revision 1 
 #define EF_MIPS_ARCH_32R2	0x70000000	//This file will run on a machine with the architecture describe for Mips32 Revision 2 
 #define EF_MIPS_ARCH_64R2	0x80000000	//This file will run on a machine with the architecture describe for Mips64 Revision 2
+
+/* Legal values for sh_type field of Elf32_Shdr.  */
+#define SHT_MIPS_LIBLIST       0x70000000 /* Shared objects used in link */
+#define SHT_MIPS_MSYM          0x70000001
+#define SHT_MIPS_CONFLICT      0x70000002 /* Conflicting symbols */
+#define SHT_MIPS_GPTAB         0x70000003 /* Global data area sizes */
+#define SHT_MIPS_UCODE         0x70000004 /* Reserved for SGI/MIPS compilers */
+#define SHT_MIPS_DEBUG         0x70000005 /* MIPS ECOFF debugging information*/
+#define SHT_MIPS_REGINFO       0x70000006 /* Register usage information */
+#define SHT_MIPS_PACKAGE       0x70000007
+#define SHT_MIPS_PACKSYM       0x70000008
+#define SHT_MIPS_RELD          0x70000009
+#define SHT_MIPS_IFACE         0x7000000b
+#define SHT_MIPS_CONTENT       0x7000000c
+#define SHT_MIPS_OPTIONS       0x7000000d /* Miscellaneous options.  */
+#define SHT_MIPS_SHDR          0x70000010
+#define SHT_MIPS_FDESC         0x70000011
+#define SHT_MIPS_EXTSYM        0x70000012
+#define SHT_MIPS_DENSE         0x70000013
+#define SHT_MIPS_PDESC         0x70000014
+#define SHT_MIPS_LOCSYM        0x70000015
+#define SHT_MIPS_AUXSYM        0x70000016
+#define SHT_MIPS_OPTSYM        0x70000017
+#define SHT_MIPS_LOCSTR        0x70000018
+#define SHT_MIPS_LINE          0x70000019
+#define SHT_MIPS_RFDESC        0x7000001a
+#define SHT_MIPS_DELTASYM      0x7000001b
+#define SHT_MIPS_DELTAINST     0x7000001c
+#define SHT_MIPS_DELTACLASS    0x7000001d
+#define SHT_MIPS_DWARF         0x7000001e /* DWARF debugging information.  */
+#define SHT_MIPS_DELTADECL     0x7000001f
+#define SHT_MIPS_SYMBOL_LIB    0x70000020
+#define SHT_MIPS_EVENTS        0x70000021 /* Event section.  */
+#define SHT_MIPS_TRANSLATE     0x70000022
+#define SHT_MIPS_PIXIE         0x70000023
+#define SHT_MIPS_XLATE         0x70000024
+#define SHT_MIPS_XLATE_DEBUG   0x70000025
+#define SHT_MIPS_WHIRL         0x70000026
+#define SHT_MIPS_EH_REGION     0x70000027
+#define SHT_MIPS_XLATE_OLD     0x70000028
+#define SHT_MIPS_PDR_EXCEPTION 0x70000029
+
+/* Legal values for sh_flags field of Elf32_Shdr.  */
+
+#define SHF_MIPS_GPREL   0x10000000 /* Must be part of global data area */
+#define SHF_MIPS_MERGE   0x20000000
+#define SHF_MIPS_ADDR    0x40000000
+#define SHF_MIPS_STRINGS 0x80000000
+#define SHF_MIPS_NOSTRIP 0x08000000
+#define SHF_MIPS_LOCAL   0x04000000
+#define SHF_MIPS_NAMES   0x02000000
+#define SHF_MIPS_NODUPE  0x01000000
+
+
+/* Symbol tables.  */
+
+/* MIPS specific values for `st_other'.  */
+#define STO_MIPS_DEFAULT        0x0
+#define STO_MIPS_INTERNAL       0x1
+#define STO_MIPS_HIDDEN         0x2
+#define STO_MIPS_PROTECTED      0x3
+#define STO_MIPS_PLT            0x8
+#define STO_MIPS_SC_ALIGN_UNUSED    0xff
+
+/* MIPS specific values for `st_info'.  */
+#define STB_MIPS_SPLIT_COMMON       13
+
 
 #endif // #ifndef ELF_H
