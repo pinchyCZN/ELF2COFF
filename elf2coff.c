@@ -121,7 +121,7 @@ int get_sheader_val(int member,int index,unsigned char *buf,int buf_size,int *re
 			size=ELF_SHEADER_OFFSETS[member][MEMBER_SIZE];
 			if(result){
 				char *data=buf+sect_offset+index*sect_size;
-				if((data+size+offset)>(buf+buf_size)){
+				if((data+size+offset)>(buf+buf_size) || data<buf){
 					printf("section header offset out of range\n");
 				}else{
 					*result=get_data(data,offset,size,endian);
@@ -136,7 +136,7 @@ int get_reloc_entry(int member,int index,int offset,unsigned char *buf,int buf_s
 {
 	int data,endian;
 	data=buf+offset+index*sizeof(struct Elf32_Rel);
-	if((data+8)>(buf+buf_size)){
+	if((data+8)>(buf+buf_size) || data<buf){
 		printf("relocation entry out of range");
 		return FALSE;
 	}
@@ -433,22 +433,43 @@ int read_reloc_val(int member,int val)
 }
 int get_symbol(int index,int section,char *out,int out_len,unsigned char *buf,int buf_len)
 {
-	int offset,size;
+	int offset,size,entsize,link;
 	if(get_sheader_val(sh_offset,section,buf,buf_len,&offset)
-		&& get_sheader_val(sh_size,section,buf,buf_len,&size)){
+		&& get_sheader_val(sh_size,section,buf,buf_len,&size)
+		&& get_sheader_val(sh_entsize,section,buf,buf_len,&entsize)
+		&& get_sheader_val(sh_link,section,buf,buf_len,&link)){
 		unsigned char *data;
-		if( (index+1)*sizeof(struct Elf32_Sym)>size ){
+		int strtab_offset,strtab_size;
+		if( (index+1)*entsize>size ){
 			printf("symbol offset out of range\n");
 			return FALSE;
 		}
-		data=buf+offset+(index*sizeof(struct Elf32_Sym));
-		if((data+sizeof(struct Elf32_Sym)) > (buf+buf_len)){
+		data=buf+offset+(index*entsize);
+		if((data+entsize) > (buf+buf_len) || data < buf){
 			printf("symbol out of range\n");
 			return FALSE;
 		}
-
-		_snprintf(out,out_len,"%s",data);
-		return TRUE;
+		if(get_sheader_val(sh_offset,link,buf,buf_len,&strtab_offset)
+			&& get_sheader_val(sh_size,link,buf,buf_len,&strtab_size)){
+			int endian;
+			if(strtab_offset+strtab_size>buf_len){
+				printf("string table out of range\n");
+				return FALSE;
+			}
+			if(get_header_val(e_endian,buf,buf_len,&endian)){
+				int val;
+				val=get_data(data,0,4,endian);
+				data=buf+strtab_offset+val;
+				if(data<buf || data>(buf+buf_len)){
+					printf("symbol string out of range\n");
+					return FALSE;
+				}
+				_snprintf(out,out_len,"%s",data);
+				if(out_len>0)
+					out[out_len-1]=0;
+				return TRUE;
+			}
+		}
 	}
 	return FALSE;
 }
