@@ -135,7 +135,7 @@ int get_sheader_val(int member,int index,unsigned char *buf,int buf_size,int *re
 int get_reloc_entry(int member,int index,int offset,unsigned char *buf,int buf_size,int *result)
 {
 	int data,endian;
-	data=offset+index*sizeof(struct Elf32_Rel);
+	data=buf+offset+index*sizeof(struct Elf32_Rel);
 	if((data+8)>(buf+buf_size)){
 		printf("relocation entry out of range");
 		return FALSE;
@@ -148,8 +148,12 @@ int get_reloc_entry(int member,int index,int offset,unsigned char *buf,int buf_s
 			val=get_data(data,0,4,endian);
 			break;
 		case r_type:
+			val=get_data(data,4,4,endian);
+			val=ELF32_R_TYPE(val);
 			break;
 		case r_sym:
+			val=get_data(data,4,4,endian);
+			val=ELF32_R_SYM(val);
 			break;
 		}
 		if(result)
@@ -404,6 +408,51 @@ int read_shead_val(int member,unsigned int val)
 		break;
 	}
 }
+int read_reloc_val(int member,int val)
+{
+	switch(member){
+	case r_type:
+		switch(val){
+		case R_MIPS_NONE:printf("R_MIPS_NONE: none");break;
+		case R_MIPS_16:printf("R_MIPS_16: S + sign_extend(A)");break;
+		case R_MIPS_32:printf("R_MIPS_32: S+A");break;
+		case R_MIPS_REL32:printf("R_MIPS_REL_32: S + A - EA");break;
+		case R_MIPS_26:printf("R_MIPS_26: (((A << 2) | ((P + 4) & 0xf0000000)) + S) >> 2");break;
+		case R_MIPS_HI16:printf("R_MIPS_HI16: high(AHL + S) The high(x) function is ( x - (short)x ) >> 16");break;
+		case R_MIPS_LO16:printf("R_MIPS_LO16: AHL + S");break;
+		case R_MIPS_GPREL16:printf("R_MIPS_GPREL16: sign_extend(A) + S + GP0 - GP");break;
+		case R_MIPS_LITERAL:printf("R_MIPS_LITERAL: sign_extend(A) + L");break;
+		case R_MIPS_GOT16:printf("R_MIPS_GOT16: See  description");break;
+		case R_MIPS_PC16:printf("R_MIPS_PC16: sign_extend(A) + S - P");break;
+		case R_MIPS_CALL16:printf("R_MIPS_CALL16: G");break;
+		case R_MIPS_GPREL32:printf("R_MIPS_GPREL32: A + S + GP0 - GP");break;
+		default:printf("unknown:%i (0x%X)",val,val);break;
+		}
+		break;
+	}
+}
+int get_symbol(int index,int section,char *out,int out_len,unsigned char *buf,int buf_len)
+{
+	int offset,size;
+	if(get_sheader_val(sh_offset,section,buf,buf_len,&offset)
+		&& get_sheader_val(sh_size,section,buf,buf_len,&size)){
+		unsigned char *data;
+		if( (index+1)*sizeof(struct Elf32_Sym)>size ){
+			printf("symbol offset out of range\n");
+			return FALSE;
+		}
+		data=buf+offset+(index*sizeof(struct Elf32_Sym));
+		if((data+sizeof(struct Elf32_Sym)) > (buf+buf_len)){
+			printf("symbol out of range\n");
+			return FALSE;
+		}
+
+		_snprintf(out,out_len,"%s",data);
+		return TRUE;
+	}
+	return FALSE;
+}
+
 int dump_elf(unsigned char *buf,int len)
 {
 	if(buf && len>0){
@@ -444,12 +493,29 @@ int dump_elf(unsigned char *buf,int len)
 				if(get_sheader_val(sh_type,j,buf,len,&val)){
 					if(val==SHT_REL){
 						int offset,size;
-						if(get_sheader_val(sh_type,j,buf,len,&offset)
-							&& get_sheader_val(sh_type,j,buf,len,&size)){
-							int roffset,rtype,rsym;
-							get_reloc_entry(r_offset,offset,size,buf,len,&roffset);
-							get_reloc_entry(r_type,offset,size,buf,len,&rtype);
-							get_reloc_entry(r_sym,offset,size,buf,len,&rsym);
+						if(get_sheader_val(sh_offset,j,buf,len,&offset)
+							&& get_sheader_val(sh_size,j,buf,len,&size)){
+							int k;
+							printf("---reloc---\n");
+							for(k=0;k<size/sizeof(struct Elf32_Rel);k++){
+								int roffset,rtype,rsym;
+								get_reloc_entry(r_offset,k,offset,buf,len,&roffset);
+								get_reloc_entry(r_type,k,offset,buf,len,&rtype);
+								get_reloc_entry(r_sym,k,offset,buf,len,&rsym);
+								printf("\treloc # %i (0x%X)\n",k,k);
+								printf("\toffset=%08X\n",roffset);
+								printf("\ttype=%08X ",rtype);
+								read_reloc_val(r_type,rtype);
+								printf("\n");
+								printf("\tsym=%08X ",rsym);
+								{
+									int link=0;
+									char tmp[256]={0};
+									get_sheader_val(sh_link,j,buf,len,&link);
+									get_symbol(rsym,link,tmp,sizeof(tmp),buf,len);
+									printf("%s\n",tmp);
+								}
+							}
 						}
 					}
 				}

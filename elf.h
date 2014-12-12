@@ -392,8 +392,8 @@ struct Elf64_Syminfo {
 
 // Relocation table entry structures
 // How to extract and insert information held in the r_info field.
-//#define ELF32_R_SYM(val)        ((val) >> 8)
-//#define ELF32_R_TYPE(val)       ((val) & 0xff)
+#define ELF32_R_SYM(val)        ((val) >> 8)
+#define ELF32_R_TYPE(val)       ((val) & 0xff)
 //#define ELF32_R_INFO(sym,type)  (((sym) << 8) + ((type) & 0xff))
 
 //#define ELF64_R_SYM(i)          ((uint32)((i) >> 32))
@@ -948,5 +948,18 @@ struct Elf64_Move {
 /* MIPS specific values for `st_info'.  */
 #define STB_MIPS_SPLIT_COMMON       13
 
+#define R_MIPS_NONE             0
+#define R_MIPS_16               1
+#define R_MIPS_32               2
+#define R_MIPS_REL32            3
+#define R_MIPS_26               4
+#define R_MIPS_HI16             5
+#define R_MIPS_LO16             6
+#define R_MIPS_GPREL16          7
+#define R_MIPS_LITERAL          8
+#define R_MIPS_GOT16            9
+#define R_MIPS_PC16             10
+#define R_MIPS_CALL16           11
+#define R_MIPS_GPREL32          12
 
 #endif // #ifndef ELF_H
