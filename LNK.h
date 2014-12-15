@@ -1,0 +1,12 @@
+#define LNKMAGIC "LNK\2"
+
+
+#define PROC_TYPE 46
+#define _PROC_TYPE_SIZE 1
+#define SECTION_SYM 16
+#define _SECTION_SYM_NUM 1
+#define _SECTION_SYM_GRP 3
+#define _SECTION_SYM_ALIGN 5
+#define _SECTION_STR_SIZE 6
+#define _SECTION_STR_START 7
+#define _SECTION_SYM_LEN_MIN 7

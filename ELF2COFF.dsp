@@ -87,10 +87,22 @@ LINK32=link.exe
 
 SOURCE=.\elf2coff.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\LNK.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\elf.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\LNK.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 

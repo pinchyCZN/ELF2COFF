@@ -61,7 +61,7 @@ struct Elf64_Ehdr {
    may have.  */
 
 /* Conglomeration of the identification bytes, for easy testing as a word.  */
-#define ELFMAG        "\177ELF"
+#define ELFMAGIC        "\177ELF"
 
 #define EI_CLASS      4    /* File class byte index */
 #define ELFCLASSNONE  0    /* Invalid class */

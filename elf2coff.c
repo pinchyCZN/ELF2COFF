@@ -14,7 +14,7 @@ typedef long int32;
 typedef __int64 int64;
 
 #include "elf.h"
-#include "coff.h"
+#include "LNK.h"
 
 const int ELF_HEADER_OFFSETS[20][2]={ //offset,size
 {0,4},{4,1},{5,1},{6,1},{7,1},{8,4},{12,4},{16,2},{18,2},{20,4},{24,4},{28,4},{32,4},{36,4},{40,2},{42,2},{44,2},{46,2},{48,2},{50,2}
@@ -545,26 +545,39 @@ int dump_elf(unsigned char *buf,int len)
 	}
 }
 
+int get_file_size(FILE *f)
+{
+	fseek(f,0,SEEK_END);
+	return ftell(f);
+}
 int dump_obj_file(char *fname)
 {
 	if(fname){
 		FILE *f;
 		f=fopen(fname,"rb");
 		if(f){
-			char buf[8]={0};
-			char *elfmagic=ELFMAG;
-			int len=sizeof(ELFMAG)-1;
-			fread(buf,1,len,f);
-			if(memcmp(buf,elfmagic,len)==0){
-				int size;
+			char buf[16]={0};
+			int fsize;
+			fseek(f,0,SEEK_END);
+			fsize=ftell(f);
+			fseek(f,0,SEEK_SET);
+			fread(buf,1,sizeof(buf),f);
+			fseek(f,0,SEEK_SET);
+			if(memcmp(buf,ELFMAGIC,sizeof(ELFMAGIC)-1)==0){
 				char *buf;
-				fseek(f,0,SEEK_END);
-				size=ftell(f);
-				buf=malloc(size);
+				buf=malloc(fsize);
 				if(buf){
-					fseek(f,0,SEEK_SET);
-					fread(buf,1,size,f);
-					dump_elf(buf,size);
+					fread(buf,1,fsize,f);
+					dump_elf(buf,fsize);
+					free(buf);
+				}
+			}
+			else if(memcmp(buf,LNKMAGIC,sizeof(LNKMAGIC)-1)==0){
+				char *buf;
+				buf=malloc(fsize);
+				if(buf){
+					fread(buf,1,fsize,f);
+					dump_lnk(buf,fsize);
 					free(buf);
 				}
 			}
