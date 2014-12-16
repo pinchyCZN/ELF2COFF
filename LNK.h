@@ -56,20 +56,38 @@ typedef struct{
 
 typedef struct{
 	unsigned char type;
-	short offset;
+	unsigned short offset;
 	short _m;
 	unsigned char sectbase;
 	short _m2;
-	short sectbase_offset;
-	short _m3;
+	unsigned int sectbase_offset;
 }PATCH_SECTION;
 
 typedef struct{
-	short a;
-	short section;
+	unsigned short num;
+	unsigned short section;
 	unsigned int offset;
 	unsigned char str_len;
 	char sym[1];
 }XDEF_SYM;
 
+typedef struct{
+	unsigned short num;
+	unsigned char str_len;
+	char sym[1];
+}XREF_SYM;
 
+typedef struct{
+	unsigned short num;
+	unsigned short section;
+	unsigned int size;
+	unsigned char str_len;
+	char sym[1];
+}XBSS_SYM;
+
+typedef struct{
+	unsigned short section;
+	unsigned int offset;
+	unsigned char str_len;
+	char str[1];
+}LOCAL_SYM;
