@@ -64,13 +64,13 @@ typedef struct{
 }PATCH_SECTION;
 
 /* 
-patch 92:
+patch:
 type byte
 offset short
 ? byte 02
 index short [local]  //at offset 7fc with [1e]
 
-patch 96:
+patch:
 type byte
 offset short
 ?? short 2c 04
@@ -78,6 +78,7 @@ sectbase short
 ? byte 00
 sectbae_offset int //at offset a68 with (sectbase(2)+$100)
 
+patch:
 type byte
 offset short
 ? short 2c 00
