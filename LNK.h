@@ -1,23 +1,23 @@
 #define LNKMAGIC "LNK"
 
 
-#define CMD_HEADER 1000
-#define CMD_EOF 0
-#define CMD_PROC_TYPE 46
+#define TAG_HEADER 1000
+#define TAG_EOF 0
+#define TAG_PROC_TYPE 46
 
-#define CMD_SECTION_SYM 16
+#define TAG_SECTION_SYM 16
 
-#define CMD_FILE_INFO 28
+#define TAG_FILE_INFO 28
 
-#define CMD_SWITCH_SECTION 6
-#define CMD_CODE_SECTION 2
-#define CMD_PATCH 10
-#define CMD_UNINIT_DATA 8
+#define TAG_SWITCH_SECTION 6
+#define TAG_CODE_SECTION 2
+#define TAG_PATCH 10
+#define TAG_UNINIT_DATA 8
 
-#define CMD_XDEF_SYM 12
-#define CMD_XREF_SYM 14
-#define CMD_LOCAL_SYM 18
-#define CMD_XBSS_SYM 48
+#define TAG_XDEF_SYM 12
+#define TAG_XREF_SYM 14
+#define TAG_LOCAL_SYM 18
+#define TAG_XBSS_SYM 48
 
 
 #pragma pack(1)
@@ -62,6 +62,30 @@ typedef struct{
 	short _m2;
 	unsigned int sectbase_offset;
 }PATCH_SECTION;
+
+/* 
+patch 92:
+type byte
+offset short
+? byte 02
+index short [local]  //at offset 7fc with [1e]
+
+patch 96:
+type byte
+offset short
+?? short 2c 04
+sectbase short
+? byte 00
+sectbae_offset int //at offset a68 with (sectbase(2)+$100)
+
+type byte
+offset short
+? short 2c 00
+offset int
+? byte 00
+sectbae_offset int //at offset a82 with ($f332211+[20])
+
+*/
 
 typedef struct{
 	unsigned short num;

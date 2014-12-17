@@ -17,7 +17,7 @@ int dump_lnk(unsigned char *buf,int buf_len)
 		unsigned char *data;
 		data=buf+offset;
 		if(offset==0){
-			val=CMD_HEADER;
+			val=TAG_HEADER;
 			increment=0;
 		}
 		else{
@@ -27,21 +27,21 @@ int dump_lnk(unsigned char *buf,int buf_len)
 			printf("%08X %i : ",offset,val);
 		}
 		switch(val){
-		case CMD_HEADER:
+		case TAG_HEADER:
 			{
 				LNK_HEADER *lh=data;
 				printf("Header : %c%c%c version %i\n",lh->MAGIC[0],lh->MAGIC[1],lh->MAGIC[2],lh->version);
 				increment+=sizeof(LNK_HEADER);
 			}
 			break;
-		case CMD_PROC_TYPE:
+		case TAG_PROC_TYPE:
 			{
 				PROC_TYPE *p=data;
 				printf("Processor type %i\n",p->type);
 				increment+=sizeof(PROC_TYPE);
 			}
 			break;
-		case CMD_SECTION_SYM:
+		case TAG_SECTION_SYM:
 			{
 				SECTION_SYM *ssym=data;
 				char str[256]={0};
@@ -51,7 +51,7 @@ int dump_lnk(unsigned char *buf,int buf_len)
 				increment+=ssym->str_len+offsetof(SECTION_SYM,str);
 			}
 			break;
-		case CMD_FILE_INFO:
+		case TAG_FILE_INFO:
 			{
 				FILE_INFO *fi=data;
 				char str[256]={0};
@@ -61,14 +61,14 @@ int dump_lnk(unsigned char *buf,int buf_len)
 				increment+=fi->str_len+offsetof(FILE_INFO,str);
 			}
 			break;
-		case CMD_SWITCH_SECTION:
+		case TAG_SWITCH_SECTION:
 			{
 				SWITCH_SECTION *ss=data;
 				printf("Switch to section %i\n",ss->num);
 				increment+=sizeof(SWITCH_SECTION);
 			}
 			break;
-		case CMD_CODE_SECTION:
+		case TAG_CODE_SECTION:
 			{
 				int i,tmp;
 				CODE_SECTION *cs=data;
@@ -84,7 +84,7 @@ int dump_lnk(unsigned char *buf,int buf_len)
 				increment+=cs->len+offsetof(CODE_SECTION,data);
 			}
 			break;
-		case CMD_PATCH:
+		case TAG_PATCH:
 			{
 				PATCH_SECTION *ps=data;
 
@@ -93,11 +93,11 @@ int dump_lnk(unsigned char *buf,int buf_len)
 				increment+=sizeof(PATCH_SECTION);
 			}
 			break;
-		case CMD_EOF:
+		case TAG_EOF:
 			offset=buf_len;
 			printf("End of file\n\n");
 			break;
-		case CMD_XDEF_SYM:
+		case TAG_XDEF_SYM:
 			{
 				XDEF_SYM *xs=data;
 				increment+=xs->str_len+offsetof(XDEF_SYM,sym);
