@@ -57,10 +57,11 @@ typedef struct{
 typedef struct{
 	unsigned char type;
 	unsigned short offset;
-	short _m;
-	unsigned char sectbase;
-	short _m2;
-	unsigned int sectbase_offset;
+	unsigned char a;
+	union{
+		unsigned char b;
+		short local;
+	};
 }PATCH_SECTION;
 
 /* 
@@ -114,5 +115,5 @@ typedef struct{
 	unsigned short section;
 	unsigned int offset;
 	unsigned char str_len;
-	char str[1];
+	char sym[1];
 }LOCAL_SYM;

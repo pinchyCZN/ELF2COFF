@@ -87,21 +87,108 @@ int dump_lnk(unsigned char *buf,int buf_len)
 		case TAG_PATCH:
 			{
 				PATCH_SECTION *ps=data;
+				printf("Patch type %i at offset 0x%X with ",ps->type,ps->offset);
+				switch(ps->a){
+				case 2:
+					printf("[0x%X]\n",ps->local);
+					increment+=6;
+					break;
+				case 0x2c:
+					switch(ps->b){
+					case 4:
+						{
+							short *sectbase=data+5;
+							printf("(sectbase (%i)",*sectbase);
+							increment+=7;
+						}
+						break;
+					case 0:
+						{
+							int *offset=data+5;
+							printf("(0x%X",*offset);
+							increment+=9;
+						}
+						break;
+					default:
+						printf("2c UKNOWN CASE!!");
+						increment+=1;
+						break;
+					}
+					increment--;
+					{
+						char *a=data+increment;
+						if(a[0]==0){
+LAST:
+							{
+							int *offset=data+increment+1;
+							printf("+ 0x%X)",*offset);
+							increment+=5;
+							}
+						}
+						else if(0[a]==0x2C && 1[a]==4){
+							short *sectbase=data+increment+2;
+							printf("+sectbase (%i)",*sectbase);
+							increment+=4;
+							if(a[4]==0)
+								goto LAST;
+							printf(")");
+						}else if(0[a]==2){
+							short *b=data+increment+1;
+							printf("+[%X])",*b);
+							increment+=3;
+						}else{
+							printf("unknown last byte");
+							increment+=1;
+						}
 
-				printf("Patch type %i at offset %X with (sectbase(%i)+0x%04X)\n",
-					ps->type,ps->offset,ps->sectbase,ps->sectbase_offset);
-				increment+=sizeof(PATCH_SECTION);
+					}
+					printf("\n");
+					increment++;
+					break;
+				default:
+					printf("UKNOWN CASE!!\n");
+					increment+=1;
+					break;
+				}
 			}
 			break;
 		case TAG_EOF:
 			offset=buf_len;
 			printf("End of file\n\n");
 			break;
+		case TAG_UNINIT_DATA:
+			{
+				int *size=data;
+				printf("Uninitialised data, %i bytes\n",*size);
+				increment+=4;
+			}
+			break;
+		case TAG_XREF_SYM:
+			{
+				XREF_SYM *xr=data;
+				increment+=xr->str_len+offsetof(XREF_SYM,sym);
+				printf("xref\n");
+			}
+			break;
 		case TAG_XDEF_SYM:
 			{
 				XDEF_SYM *xs=data;
 				increment+=xs->str_len+offsetof(XDEF_SYM,sym);
 				printf("xdef\n");
+			}
+			break;
+		case TAG_XBSS_SYM:
+			{
+				XBSS_SYM *xb=data;
+				increment+=xb->str_len+offsetof(XBSS_SYM,sym);
+				printf("xbss\n");
+			}
+			break;
+		case TAG_LOCAL_SYM:
+			{
+				LOCAL_SYM *ls=data;
+				increment+=ls->str_len+offsetof(LOCAL_SYM,sym);
+				printf("xbss\n");
 			}
 			break;
 		default:
